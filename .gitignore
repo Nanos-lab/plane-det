@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# 运行产出物不进版本控制，仅保留目录结构
+outputs/*
+!outputs/.gitkeep
+
+# 原始数据体量大且不入库，仅保留目录结构
+data/raw/*
+!data/raw/.gitkeep
+
+# 处理后的数据（特征表等）可由 raw 数据重新生成，不入库，仅保留目录结构
+data/processed/**/*
+!data/processed/**/.gitkeep

@@ -1,0 +1,65 @@
+{
+  "features": [
+    {
+      "id": "feat-001",
+      "name": "Agent 开发工程化脚手架搭建",
+      "description": "搭建并落地 agents.md、feature-list.json、progress.md、init.ps1 等开发工程化相关文件，固定使用 conda 环境 imgforge（E:\\anaconda3\\envs\\imgforge\\python.exe）作为验证环境，不使用 conda run / conda activate",
+      "dependencies": [],
+      "status": "done",
+      "evidence": "init.ps1 已验证可运行（exit code 0，Python 版本确认、requirements.txt 依赖检查通过、无 tests 目录时正确跳过测试）；agents.md 已改写为中文并对齐航迹点迹特征识别的项目方向；progress.md 已记录本阶段变更"
+    },
+    {
+      "id": "feat-002",
+      "name": "项目目录结构搭建（data / src / outputs）",
+      "description": "创建模块化开发所需的三个基础目录：data（原始及处理后的航迹点迹数据）、src（核心源代码，特征工程/模型/训练与推理逻辑）、outputs（运行产出物，如模型权重、日志、评估报告、预测结果）",
+      "dependencies": ["feat-001"],
+      "status": "done",
+      "evidence": "已创建 data/、src/、outputs/ 三个目录；src/ 下补充 __init__.py 使其可作为 Python 包导入；各目录以 .gitkeep 占位保证空目录可被追踪；.gitignore 中将 outputs/ 内容排除版本控制（仅保留目录结构），避免产出物污染仓库"
+    }
+    ,
+    {
+      "id": "feat-003",
+      "name": "模块初始化规范确立 + handle_data 模块骨架搭建",
+      "description": "确立统一的模块初始化结构（__init__.py + config/config.yaml + config/config.py + README.md），在 architecture.md 中记录该规范与模块索引表；按此规范搭建 src/handle_data 模块骨架（用于处理原始航迹点迹数据）",
+      "dependencies": ["feat-002"],
+      "status": "done",
+      "evidence": "新增 architecture.md，包含模块初始化结构说明和模块索引表；新增 src/handle_data/__init__.py、config/__init__.py、config/config.yaml、config/config.py、README.md；已验证 config.py 中 load_config() 可正常读取 config.yaml（返回 {'paths': {'raw_dir': 'data/raw'}}）；agents.md 必需文件列表已补充 architecture.md、issues-log.md"
+    }
+    ,
+    {
+      "id": "feat-004",
+      "name": "航迹统计特征提取功能（track_features）",
+      "description": "实现从单条航迹点迹序列提取统计特征：max_speed、cruise_speed、max_height、cruise_height、max_acceleration、max_deceleration、max_climb_rate、max_descent_rate、max_heading_rate。提供单条航迹计算函数 extract_track_features 和批量处理函数 extract_features_from_tracks（按 id 分组，跳过点数不足的航迹并计数打印）",
+      "dependencies": ["feat-003"],
+      "status": "done",
+      "evidence": "新增 src/handle_data/track_features.py；config.yaml 补充 columns/time/track_features 配置块；用 data/raw/prepared.csv（250 条航迹）验证 extract_features_from_tracks 可正常输出 250 行特征表，数值范围合理（加减速个位数、爬升下降率十几到几十米/秒、航向变化率个位数度/秒）；额外构造 5 点短航迹验证跳过逻辑正常工作并打印跳过数量。排查修复了一个 pandas 3.0 datetime64 精度（us 而非 ns）导致的时间差计算错误 bug"
+    }
+    ,
+    {
+      "id": "feat-005",
+      "name": "特征文件保存与读取（save_features / load_features）",
+      "description": "在 track_features.py 中新增 save_features 和 load_features，将 extract_features_from_tracks 输出的特征表保存为 data/processed/features.csv，并支持后续直接读取，供模型训练阶段复用",
+      "dependencies": ["feat-004"],
+      "status": "done",
+      "evidence": "config.yaml 补充 paths.processed_dir 和 features_file.filename；新增 data/processed/ 目录并加入 .gitignore（派生数据不入库）；已验证 save_features 写出 data/processed/features.csv（250 行），load_features 读回后与原特征表数值一致"
+    }
+    ,
+    {
+      "id": "feat-006",
+      "name": "按分层模型重构模块结构 + level1_size 特征提取与数据集划分",
+      "description": "将原本通用的 handle_data/track_features.py 拆分重构：公共、与任务无关的原子特征计算函数下沉到 handle_data/feature_extract/（kinematics.py、time_utils.py、io_utils.py），handle_data 顶层 config.yaml 只保留原始数据公共信息（columns、time、paths.raw_dir）；新建 handle_data/level1_size/ 层级模块，包含该层级专属的 features.py（组合调用公共函数构建特征表）和 dataset.py（机型->大类映射 + 分层抽样划分训练/测试集），以及专属 config.yaml（机型映射、划分比例、路径等）。该层级任务：大型机/小型机二分类",
+      "dependencies": ["feat-005"],
+      "status": "done",
+      "evidence": "新增 feature_extract/{kinematics.py,time_utils.py,io_utils.py,README.md}；新增 level1_size/{features.py,dataset.py,config/,README.md}；删除旧 track_features.py 及旧 data/processed/features.csv；新产物路径 data/processed/level1_size/features.csv、data/splits/level1_size/{train.csv,test.csv}，均已加入 .gitignore；端到端验证：250 条航迹提取出 250 行特征，按 8:2 分层抽样划分为 train(200)/test(50)，大型机占比在 train/test 中均为 0.4（一致）；map_to_category 对未知机型正确抛出 ValueError；architecture.md 模块列表已更新为 handle_data/feature_extract/level1_size 三行"
+    }
+    ,
+    {
+      "id": "feat-007",
+      "name": "level1_size 产物目录合并（features/train/test 统一到 data/processed/level1_size）",
+      "description": "将 level1_size 的训练/测试集划分结果输出目录由 data/splits/level1_size 改为 data/processed/level1_size，与该层级的 features.csv 放在同一目录下，便于按层级集中管理所有产物；移除不再使用的 data/splits/ 目录",
+      "dependencies": ["feat-006"],
+      "status": "done",
+      "evidence": "修改 level1_size/config/config.yaml 中 paths.split_dir 为 data/processed/level1_size；删除 data/splits/ 目录；更新 .gitignore 移除 data/splits/ 相关规则；重新跑通端到端流程，确认 features.csv、train.csv、test.csv 均正确输出到 data/processed/level1_size/"
+    }
+  ]
+}

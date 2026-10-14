@@ -1,0 +1,36 @@
+# level1_size 层级专属配置：大型机/小型机二分类任务
+
+# 该层级使用的特征，输出列顺序
+track_features:
+  min_points: 10
+  round_digits: 2
+  output_columns:
+    - "max_speed"
+    - "cruise_speed"
+    - "max_height"
+    - "cruise_height"
+    - "max_acceleration"
+    - "max_deceleration"
+    - "max_climb_rate"
+    - "max_descent_rate"
+    - "max_heading_rate"
+
+# 机型到大类的映射：1=大型机，0=小型机
+category_mapping:
+  large: ["B-1B", "B-52H", "E-3", "KC-135", "KC-46", "RC-135S", "RC-135UVW", "MQ-4C", "RQ-4", "P-8A"]
+  small: ["C-130", "E-2D", "EA-18G", "F-15", "F-16", "F-22", "F-35A", "F-35B", "F-35C", "F/A-18", "KC-130", "U-2", "庞巴迪60X", "庞巴迪6500", "雅典娜RS"]
+
+# 数据集划分配置
+split:
+  test_size: 0.2
+  random_seed: 42
+
+# 列名（该层级专属，与 handle_data 顶层解耦）
+columns:
+  aircraft_type: "aircraft_type"
+  category: "category"
+
+# 路径配置
+paths:
+  features_file: "data/processed/level1_size/features.csv"
+  split_dir: "data/processed/level1_size"
