@@ -1,9 +1,5 @@
 pandas
 numpy
-duckdb
 pyyaml
 scikit-learn
 joblib
-pydantic
-fastapi
-uvicorn

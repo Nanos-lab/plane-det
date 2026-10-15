@@ -32,5 +32,5 @@ columns:
 
 # 路径配置
 paths:
-  features_file: "data/processed/level1_size/features.csv"
-  split_dir: "data/processed/level1_size"
+  output_dir: "data/processed/level1_size"
+  features_filename: "features.csv"

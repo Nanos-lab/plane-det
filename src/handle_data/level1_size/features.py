@@ -25,7 +25,8 @@ _ROUND_DIGITS = _LEVEL_CONFIG["track_features"]["round_digits"]
 _OUTPUT_COLUMNS = _LEVEL_CONFIG["track_features"]["output_columns"]
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
-_FEATURES_FILE_PATH = _PROJECT_ROOT / _LEVEL_CONFIG["paths"]["features_file"]
+_OUTPUT_DIR = _PROJECT_ROOT / _LEVEL_CONFIG["paths"]["output_dir"]
+_FEATURES_FILE_PATH = _OUTPUT_DIR / _LEVEL_CONFIG["paths"]["features_filename"]
 
 
 def extract_track_features(df: pd.DataFrame) -> pd.Series:
@@ -109,10 +110,10 @@ def extract_features_from_tracks(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def save_features(features_df: pd.DataFrame, output_path: Path = _FEATURES_FILE_PATH) -> Path:
-    """保存 level1_size 特征表，默认路径由配置中的 paths.features_file 决定。"""
+    """保存 level1_size 特征表，默认路径由配置中的 paths.output_dir + paths.features_filename 决定。"""
     return io_utils.save_dataframe(features_df, output_path)
 
 
 def load_features(input_path: Path = _FEATURES_FILE_PATH) -> pd.DataFrame:
-    """读取已保存的 level1_size 特征表，默认路径由配置中的 paths.features_file 决定。"""
+    """读取已保存的 level1_size 特征表，默认路径由配置中的 paths.output_dir + paths.features_filename 决定。"""
     return io_utils.load_dataframe(input_path)

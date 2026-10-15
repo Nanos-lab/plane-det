@@ -25,7 +25,7 @@ _TEST_SIZE = _CONFIG["split"]["test_size"]
 _RANDOM_SEED = _CONFIG["split"]["random_seed"]
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
-_SPLIT_DIR = _PROJECT_ROOT / _CONFIG["paths"]["split_dir"]
+_OUTPUT_DIR = _PROJECT_ROOT / _CONFIG["paths"]["output_dir"]
 
 
 def map_to_category(aircraft_type: str) -> int:
@@ -69,10 +69,10 @@ def split_dataset(features_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame
 def save_split(
     train_df: pd.DataFrame,
     test_df: pd.DataFrame,
-    output_dir: Path = _SPLIT_DIR,
+    output_dir: Path = _OUTPUT_DIR,
 ) -> tuple[Path, Path]:
     """
-    保存划分后的训练集和测试集，默认目录由配置中的 paths.split_dir 决定。
+    保存划分后的训练集和测试集，默认目录由配置中的 paths.output_dir 决定。
 
     返回：
         (train_path, test_path)

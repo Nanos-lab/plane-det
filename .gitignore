@@ -3,8 +3,8 @@ __pycache__/
 .pytest_cache/
 
 # 运行产出物不进版本控制，仅保留目录结构
-outputs/*
-!outputs/.gitkeep
+outputs/**/*
+!outputs/**/.gitkeep
 
 # 原始数据体量大且不入库，仅保留目录结构
 data/raw/*

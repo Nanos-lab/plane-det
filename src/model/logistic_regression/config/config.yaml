@@ -1,0 +1,20 @@
+# logistic_regression 模型配置
+
+# 数据来源：该模型专属配置的数据路径，与 handle_data 内部结构解耦，
+# 只要目标 csv 的列结构（特征列 + label 列）不变，这里的路径可以指向任意数据来源
+data:
+  train_path: "data/processed/level1_size/train.csv"
+  test_path: "data/processed/level1_size/test.csv"
+  label_column: "category"
+
+# 逻辑回归超参数
+model:
+  C: 1.0
+  max_iter: 1000
+  random_seed: 42
+
+# 输出路径
+paths:
+  output_dir: "outputs/logistic_regression"
+  model_filename: "model.joblib"
+  evaluation_filename: "evaluation.json"

@@ -22,7 +22,7 @@ level1_size/
 
 - `extract_track_features(df)`：单条航迹 -> 一行特征 Series（aircraft_type + 9 个特征）
 - `extract_features_from_tracks(df)`：批量提取多条航迹特征，跳过点数不足的航迹并打印跳过数量
-- `save_features(features_df, output_path=...)` / `load_features(input_path=...)`：特征表保存与读取，默认路径为配置中的 `paths.features_file`
+- `save_features(features_df, output_path=...)` / `load_features(input_path=...)`：特征表保存与读取，默认路径由 `paths.output_dir` + `paths.features_filename` 组合而成
 
 提取的特征：max_speed、cruise_speed、max_height、cruise_height、max_acceleration、max_deceleration、max_climb_rate、max_descent_rate、max_heading_rate
 
@@ -45,8 +45,8 @@ level1_size/
 | `split.test_size` | 测试集比例 |
 | `split.random_seed` | 划分随机种子 |
 | `columns.aircraft_type` / `.category` | 该层级用到的列名 |
-| `paths.features_file` | 特征表输出路径，默认 `data/processed/level1_size/features.csv` |
-| `paths.split_dir` | 划分结果输出目录，默认 `data/processed/level1_size`（与特征表同目录，便于该层级产物集中管理） |
+| `paths.output_dir` | 该层级所有产物（特征表、train/test）的统一输出目录，默认 `data/processed/level1_size` |
+| `paths.features_filename` | 特征表文件名，默认 `features.csv` |
 
 ## 当前状态
 

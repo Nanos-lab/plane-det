@@ -80,3 +80,27 @@ pandas, numpy, duckdb, pyyaml, scikit-learn, joblib, pydantic, fastapi, uvicorn
 - `level1_size` 的训练/测试集划分结果不再单独放 `data/splits/level1_size/`，改为与 `features.csv` 同目录，统一输出到 `data/processed/level1_size/`（该层级所有产物集中管理）
 - 修改 `config/config.yaml` 中 `paths.split_dir`，删除不再使用的 `data/splits/` 目录，`.gitignore` 同步移除相关规则
 - 重新验证：`features.csv`、`train.csv`、`test.csv` 均正确输出到 `data/processed/level1_size/`
+
+## 2026-10-14 补充：配置项重命名（split_dir -> output_dir）
+
+- `paths.split_dir` 改名为 `paths.output_dir`，更准确反映"该层级所有产物统一输出目录"（不只是划分结果）
+- `paths.features_file` 拆分为 `paths.output_dir` + `paths.features_filename`，消除与 output_dir 的路径重复
+- 已重新验证 features/train/test 三个文件均正确输出
+
+## 2026-10-15 补充：model 模块与 logistic_regression 训练/评估
+
+- 新建 `src/model/`：模型主目录，按模型类型（而非数据层级）组织子模块，与 `handle_data` 完全解耦
+  - 模型侧只通过 `config.yaml` 里的 `data.train_path` / `data.test_path` / `data.label_column` 读取数据，不感知数据处理模块的内部层级结构
+- 新建 `src/model/logistic_regression/`：
+  - `train.py`：读取训练数据（除 label_column 外所有列作为特征），构建 `StandardScaler + LogisticRegression` 的 Pipeline 并训练，保存为 `.joblib`
+  - `evaluate.py`：读取测试数据和模型，计算 accuracy/precision/recall/f1/confusion_matrix，保存为 json
+  - 专属 `config/config.yaml`：数据路径、label 列名、模型超参数（C/max_iter/random_seed）、输出路径
+- 端到端验证：训练和评估均可通过 `python -m src.model.logistic_regression.train` / `.evaluate` 运行，产物正确输出到 `outputs/logistic_regression/`
+- 当前模拟数据未刻意制造大型机/小型机的特征差异，评估结果 accuracy 约 0.58，符合预期（数据本身限制，非代码问题）
+- 修正 `.gitignore` 中 `outputs/*` 规则为 `outputs/**/*`，确保子目录（如 `outputs/logistic_regression/`）结构被正确保留
+
+## 2026-10-15 补充：清理 requirements.txt 未使用的依赖
+
+- 检查 `src/`、`scripts/` 下所有 `.py` 文件的 import，确认 `duckdb`、`pydantic`、`fastapi`、`uvicorn` 四个包未被任何代码引用
+- 从 `requirements.txt` 中移除，保留实际用到的 `pandas`、`numpy`、`pyyaml`、`scikit-learn`、`joblib`
+- 重新验证：`init.ps1` 正常安装依赖并跑通；`logistic_regression` 的训练+评估全流程功能不受影响

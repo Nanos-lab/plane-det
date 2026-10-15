@@ -61,5 +61,14 @@
       "status": "done",
       "evidence": "修改 level1_size/config/config.yaml 中 paths.split_dir 为 data/processed/level1_size；删除 data/splits/ 目录；更新 .gitignore 移除 data/splits/ 相关规则；重新跑通端到端流程，确认 features.csv、train.csv、test.csv 均正确输出到 data/processed/level1_size/"
     }
+    ,
+    {
+      "id": "feat-008",
+      "name": "model 模块搭建 + logistic_regression 训练与评估",
+      "description": "新建 src/model/ 作为模型主目录，按模型类型（而非数据层级）组织子模块，与 handle_data 完全解耦（通过配置中的数据路径读取，不感知数据处理内部结构）。新建 model/logistic_regression/ 子模块：train.py 读取训练数据，构建 StandardScaler + LogisticRegression 的 Pipeline 并训练保存；evaluate.py 读取测试数据和已保存模型，计算 accuracy/precision/recall/f1/confusion_matrix 并保存为 json",
+      "dependencies": ["feat-007"],
+      "status": "done",
+      "evidence": "新增 src/model/{__init__.py,config/,README.md}、src/model/logistic_regression/{__init__.py,config/,train.py,evaluate.py,README.md}；config.yaml 包含 data（train/test路径、label_column）、model（C/max_iter/random_seed）、paths（output_dir/model_filename/evaluation_filename）三个配置块；端到端验证：python -m src.model.logistic_regression.train 训练并保存模型到 outputs/logistic_regression/model.joblib；python -m src.model.logistic_regression.evaluate 计算指标并保存到 outputs/logistic_regression/evaluation.json（json 格式校验通过）；outputs/ 目录 .gitignore 规则由 outputs/* 改为 outputs/**/* 以正确保留子目录结构"
+    }
   ]
 }
